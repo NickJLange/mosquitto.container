@@ -1,61 +1,7 @@
 ---
-###############################################################################
-################################# INSTALL #####################################
-###############################################################################
-
-- stat:
-    path: "{{ mqtt_prefix }}"
-  register: installed_ok
-  tags:
-    - mqtt_systemd
-
-- block:
-  - name: create the tld  paths
-    file:
-      path: "{{ mqtt_prefix }}/"
-      state: directory
-      mode: 0755
-      owner: "{{mqtt_user}}"
-      group: "{{mqtt_group}}"
-  - name: create the conf paths
-    file:
-      path: "{{ mqtt_conf_dir }}"
-      state: directory
-      mode: 0755
-      owner: "{{mqtt_user}}"
-      group: "{{mqtt_group}}"
-  - name: create the data  paths
-    file:
-      path: "{{ mqtt_prefix }}/data"
-      state: directory
-      mode: 0755
-      owner: "{{mqtt_user}}"
-      group: "{{mqtt_group}}"
-  - name: create the log  paths
-    file:
-      path: "{{ mqtt_prefix }}/log"
-      state: directory
-      mode: 0755
-      owner: "{{mqtt_user}}"
-      group: "{{mqtt_group}}"
-
-  when: installed_ok.stat.exists == true
 
 
-###############################################################################
-################################ Initial Pull ####################################
-###############################################################################
 
-
-- name: Pull latest mqtt image
-  shell: "{{podman_path}} pull {{ image_name }}"
-  args:
-    executable: /bin/bash
-  register: pull_ok
-  become_user: "{{mqtt_user}}"
-  become: true
-- debug:
-   msg: "{{pull_ok}}"
 
 
 #--name=mqtt  --env-file=envfile -v ./etc-mqtt/:/etc/mqtt/:z -v ./etc-dnsmasq.d/:/etc/dnsmasq.d/:z --network=host mqtt/mqtt:latest
@@ -64,47 +10,11 @@
 ################################ CONFIGURE ####################################
 ###############################################################################
 
-- block:
 
-  - name: Add envfile for pihhole
-    template:
-      src: mqtt.envfile.j2
-      dest: "{{mqtt_env_file}}"
-      mode: 0600
-      owner: "{{mqtt_user}}"
-      group: "{{mqtt_group}}"
-    notify: restart mqtt
-
-  - name: Add default config
-    template:
-      src: config.conf.j2
-      dest: "{{mqtt_conf_dir}}/mosquitto.conf"
-      mode: 0600
-      owner: "{{mqtt_user}}"
-      group: "{{mqtt_group}}"
-
-
-  - name: First run of image (no idea if I can )
-    shell: "{{podman_path}} run -d --replace=true --name=mosquitto --env-file={{ mqtt_env_file }} \
-    --net=host -v {{ mqtt_conf_dir }}/mosquitto.conf:/mosquitto/config/mosquitto.conf -v {{ mqtt_prefix }}/data:/mosquitto/data -v {{ mqtt_prefix }}/log:/mosquitto/log {{ image_name }}"
-    args:
-      executable: /bin/bash
-    register: pull_ok
-    become_user: "{{ mqtt_user }}"
-
-  - name: configure mqtt for systemd
-    template:
-      src: mqtt.service.j2
-      dest: "{{ systemd_dir }}/mqtt.service"
-      mode: 0600
-    notify: reload systemd
-
-  - name: enable mqtt
-    service:
-      name: mqtt
-      enabled: yes
-      state: started
-
-  become: yes
-  become_user: "root"
-  tags: mqtt_systemd
+- name: Add envfile for {{container_friendly_name}}
+  template:
+    src: container.envfile.j2
+    dest: "{{container_env_file}}"
+    mode: 0644
+    owner: "{{container_user}}"
+    group: "{{container_group}}"
