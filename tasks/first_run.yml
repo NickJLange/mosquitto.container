@@ -1,0 +1,16 @@
+---
+###############################################################################
+################################# INSTALL #####################################
+###############################################################################
+
+
+# - debug: var=preexisting
+
+
+  - name: First run of image (no idea if I can )
+    shell: "{{podman_path}} run -d --replace=true --name=mosquitto --env-file={{ mqtt_env_file }} \
+    --net=host -v {{ mqtt_conf_dir }}/mosquitto.conf:/mosquitto/config/mosquitto.conf -v {{ mqtt_prefix }}/data:/mosquitto/data -v {{ mqtt_prefix }}/log:/mosquitto/log {{ image_name }}"
+    args:
+      executable: /bin/bash
+    register: pull_ok
+    become_user: "{{ mqtt_user }}"

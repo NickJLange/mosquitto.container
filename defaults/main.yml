@@ -9,12 +9,10 @@ mqtt_conf_dir: "{{ mqtt_prefix }}/etc/"
 # May not need
 mqtt_system_conf_dir: "{{ mqtt_system_prefix }}/etc/"
 mqtt_env_file: "{{ mqtt_prefix }}/envfile.conf"
-podman_path: "/usr/local/bin/podman"
+podman_path: "/usr/bin/podman"
 systemd_dir: "/etc/systemd/system"
 
-image_name: "eclipse-mosquitto:latest"
+image_name: "docker.io/eclipse-mosquitto:latest"
 service_name: "mosquitto"
 
-#podman run --name=mqtt  --env-file=envfile -v {{mqtt_conf_dir}}/:/etc/mqtt/:z -v {{mqtt_system_dnsmasq}}:/etc/dnsmasq.d/:z --network=host mqtt/mqtt:latest
-## Userspace someday with new podman
-##podman run --name=pi-hole --env-file=envfile -v ./etc-mqtt/:/etc/mqtt/:z -v ./etc-dnsmasq.d/:/etc/dnsmasq.d/:z -p ${PIFACE}:1053:53/tcp -p ${PIFACE}:1053:53/udp -p ${PIFACE}:1067:67/tcp -p ${PIFACE}:8001:80 -p ${PIFACE}:1080:80/tcp -p ${PIFACE}:8002:443/tcp -p ${PIFACE}:1443:443/tcp --cidfile %t/container-mqtt.ctr-id --cgroups=no-conmon nickjlange/njl-pi-hole
+ 
