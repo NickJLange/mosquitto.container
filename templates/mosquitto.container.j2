@@ -1,0 +1,19 @@
+[Unit]
+Description=Mosquitto MQTT Broker Container
+After=network-online.target
+
+[Container]
+Image={{ image_name }}
+ContainerName={{ service_name }}
+EnvironmentFile={{ mqtt_env_file }}
+Network=host
+Volume={{ mqtt_conf_dir }}mosquitto.conf:/mosquitto/config/mosquitto.conf:Z
+Volume={{ mqtt_prefix }}/data:/mosquitto/data:Z
+Volume={{ mqtt_prefix }}/log:/mosquitto/log:Z
+AutoUpdate=registry
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
