@@ -1,6 +1,9 @@
 [Unit]
 Description=Mosquitto MQTT Broker Container
 After=network-online.target
+{% for path in container_required_paths | default([]) %}
+AssertPathExists={{ path }}
+{% endfor %}
 
 [Container]
 Image={{ image_name }}
@@ -10,6 +13,9 @@ Network=host
 Volume={{ mqtt_conf_dir }}mosquitto.conf:/mosquitto/config/mosquitto.conf:Z
 Volume={{ mqtt_prefix }}/data:/mosquitto/data:Z
 Volume={{ mqtt_prefix }}/log:/mosquitto/log:Z
+{% if mqtt_tls_enabled | bool %}
+Volume=/etc/letsencrypt/:/ssl/:ro
+{% endif %}
 AutoUpdate=registry
 
 [Service]

@@ -16,3 +16,10 @@ image_name: "docker.io/eclipse-mosquitto:latest"
 service_name: "mosquitto"
 
  
+# TLS listener on 8883 alongside plain MQTT on 1883; off until certs are rolled out
+mqtt_tls_enabled: false
+mqtt_tls_port: 8883
+mqtt_tls_certfile: /etc/letsencrypt/server.cert
+mqtt_tls_keyfile: /etc/letsencrypt/server.key
+# Rendered as AssertPathExists= and checked at deploy, only when TLS is on
+container_required_paths: "{{ [mqtt_tls_certfile, mqtt_tls_keyfile] if mqtt_tls_enabled | bool else [] }}"
