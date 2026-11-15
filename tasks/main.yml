@@ -17,6 +17,9 @@
     that:
       - mqtt_tls_certfile is match('/etc/letsencrypt/')
       - mqtt_tls_keyfile is match('/etc/letsencrypt/')
+      # relpath() would turn ../ segments into a path outside the /ssl mount
+      - mqtt_tls_certfile is not search('(^|/)\\.\\.?(/|$)')
+      - mqtt_tls_keyfile is not search('(^|/)\\.\\.?(/|$)')
     fail_msg: "mqtt_tls_certfile and mqtt_tls_keyfile must live under /etc/letsencrypt, the only tree mounted into the container at /ssl."
   when: mqtt_tls_enabled | bool
 
